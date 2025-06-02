@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Transaction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header, footer {
+            background-color: #0074cc;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .wallet {
+            background-color: #e0f7ff;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #wallet-text {
+            color: blue;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #wallet-balance {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .wallet-owner {
+            font-size: 14px;
+            color: grey;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            background-color: #0074cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #005fa3;
+        }
+        .hidden {
+            display: none;
+        }
+        #success-message {
+            text-align: center;
+            padding: 20px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .wallet {
+                padding: 10px;
+            }
+            #wallet-balance {
+                font-size: 24px;
+            }
+        }
+    </style>
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,ko,th,tr,es,pt,fr,de,it,ja,zh,ru,pl,da,sv,fi,nl,ro,hu,cs,sk,sl,vi,id,ms,tl,hi,bn,ar',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        };
+    </script>
+    <script>
+        let walletBalance = 5000000;
+
+        // Language translations
+        const translations = {
+            en: {
+                walletBalance: "Wallet Balance",
+                recipientName: "Recipient Name",
+                recipientAccountNumber: "Recipient Account Number",
+                bankName: "Bank Name",
+                amountToSend: "Amount to be Sent",
+                submit: "Submit",
+                transactionSuccessful: "Transaction Successful!",
+                insufficientFunds: "Insufficient funds!",
+                amountTransferred: "Amount Transferred",
+                transactionId: "Transaction ID"
+            },
+            fr: {
+                walletBalance: "Solde du portefeuille",
+                recipientName: "Nom du destinataire",
+                recipientAccountNumber: "Numéro de compte du destinataire",
+                bankName: "Nom de la banque",
+                amountToSend: "Montant à envoyer",
+                submit: "Soumettre",
+                transactionSuccessful: "Transaction réussie!",
+                insufficientFunds: "Fonds insuffisants!",
+                amountTransferred: "Montant transféré",
+                transactionId: "ID de transaction"
+            },
+            es: {
+                walletBalance: "Saldo de la billetera",
+                recipientName: "Nombre del destinatario",
+                recipientAccountNumber: "Número de cuenta del destinatario",
+                bankName: "Nombre del banco",
+                amountToSend: "Monto a enviar",
+                submit: "Enviar",
+                transactionSuccessful: "¡Transacción exitosa!",
+                insufficientFunds: "¡Fondos insuficientes!",
+                amountTransferred: "Monto transferido",
+                transactionId: "ID de transacción"
+            },
+            tr: {
+                walletBalance: "Cüzdan Bakiyesi",
+                recipientName: "Alıcı Adı",
+                recipientAccountNumber: "Alıcı Hesap Numarası",
+                bankName: "Banka Adı",
+                amountToSend: "Gönderilecek Miktar",
+                submit: "Gönder",
+                transactionSuccessful: "İşlem Başarılı!",
+                insufficientFunds: "Yetersiz bakiye!",
+                amountTransferred: "Gönderilen Tutar",
+                transactionId: "İşlem ID'si"
+            },
+            ko: {
+                walletBalance: "지갑 잔액",
+                recipientName: "받는 사람 이름",
+                recipientAccountNumber: "받는 사람 계좌 번호",
+                bankName: "은행 이름",
+                amountToSend: "보낼 금액",
+                submit: "제출",
+                transactionSuccessful: "거래 성공!",
+                insufficientFunds: "잔액 부족!",
+                amountTransferred: "송금 금액",
+                transactionId: "거래 ID"
+            },
+            ja: {
+                walletBalance: "ウォレット残高",
+                recipientName: "受取人名",
+                recipientAccountNumber: "受取人の口座番号",
+                bankName: "銀行名",
+                amountToSend: "送金額",
+                submit: "送信",
+                transactionSuccessful: "取引成功！",
+                insufficientFunds: "残高不足！",
+                amountTransferred: "送金額",
+                transactionId: "取引ID"
+            },
+            vi: {
+                walletBalance: "Số dư ví",
+                recipientName: "Tên người nhận",
+                recipientAccountNumber: "Số tài khoản người nhận",
+                bankName: "Tên ngân hàng",
+                amountToSend: "Số tiền gửi",
+                submit: "Gửi",
+                transactionSuccessful: "Giao dịch thành công!",
+                insufficientFunds: "Không đủ tiền!",
+                amountTransferred: "Số tiền đã chuyển",
+                transactionId: "Mã giao dịch"
+            },
+            th: {
+                walletBalance: "ยอดเงินในกระเป๋า",
+                recipientName: "ชื่อผู้รับ",
+                recipientAccountNumber: "หมายเลขบัญชีผู้รับ",
+                bankName: "ชื่อธนาคาร",
+                amountToSend: "จำนวนเงินที่ส่ง",
+                submit: "ส่ง",
+                transactionSuccessful: "การทำธุรกรรมสำเร็จ!",
+                insufficientFunds: "ยอดเงินไม่เพียงพอ!",
+                amountTransferred: "จำนวนเงินที่โอน",
+                transactionId: "หมายเลขธุรกรรม"
+            }
+        };
+
+        function updateWalletBalance() {
+            let amount = parseFloat(document.getElementById('amount').value) || 0;
+            let remainingBalance = walletBalance - amount;
+            document.getElementById('wallet-balance').innerText = `$${remainingBalance.toLocaleString()}`;
+        }
+
+        function submitTransaction() {
+            let amount = parseFloat(document.getElementById('amount').value);
+            let recipientName = document.getElementById('recipient-name').value;
+            let recipientAccountNumber = document.getElementById('recipient-account-number').value;
+            let bankName = document.getElementById('bank-name').value;
+            let transactionId = Math.floor(Math.random() * 1000000000);
+
+            if (amount > walletBalance) {
+                alert(translations[selectedLanguage].insufficientFunds);
+            } else {
+                walletBalance -= amount;
+                document.getElementById('transaction-form').classList.add('hidden');
+                document.getElementById('success-message').innerHTML = `
+                    <h2>${translations[selectedLanguage].transactionSuccessful}</h2>
+                    <p><strong>${translations[selectedLanguage].recipientName}:</strong> ${recipientName}</p>
+                    <p><strong>${translations[selectedLanguage].recipientAccountNumber}:</strong> ${recipientAccountNumber}</p>
+                    <p><strong>${translations[selectedLanguage].bankName}:</strong> ${bankName}</p>
+                    <p><strong>${translations[selectedLanguage].amountTransferred}:</strong> $${amount.toLocaleString()}</p>
+                    <p><strong>${translations[selectedLanguage].transactionId}:</strong> ${transactionId}</p>
+                `;
+                document.getElementById('success-message').classList.remove('hidden');
+            }
+        }
+
+        let selectedLanguage = 'en';
+        function changeLanguage(language) {
+            selectedLanguage = language;
+            document.getElementById('wallet-text').innerText = translations[language].walletBalance;
+            document.querySelector('label[for="recipient-name"]').innerText = translations[language].recipientName;
+            document.querySelector('label[for="recipient-account-number"]').innerText = translations[language].recipientAccountNumber;
+            document.querySelector('label[for="bank-name"]').innerText = translations[language].bankName;
+            document.querySelector('label[for="amount"]').innerText = translations[language].amountToSend;
+            document.getElementById('submit-btn').innerText = translations[language].submit;
+        }
+    </script>
+</head>
+<body onload="changeLanguage('en')">
+    <br/>
+   
+        <div id="google_translate_element"></div>
+        <select id="languageSelector" onchange="changeLanguage()">
+            <option value="en">English</option>
+            <option value="ko">Korean</option>
+            <option value="th">Thai</option>
+            <option value="tr">Turkish</option>
+            <option value="es">Spanish</option>
+            <option value="pt">Portuguese</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="ja">Japanese</option>
+            <option value="zh">Chinese</option>
+            <option value="ru">Russian</option>
+            <option value="pl">Polish</option>
+            <option value="da">Danish</option>
+            <option value="sv">Swedish</option>
+            <option value="fi">Finnish</option>
+            <option value="nl">Dutch</option>
+            <option value="ro">Romanian</option>
+            <option value="hu">Hungarian</option>
+            <option value="cs">Czech</option>
+            <option value="sk">Slovak</option>
+            <option value="sl">Slovene</option>
+            <option value="vi">Vietnamese</option>
+            <option value="id">Indonesian</option>
+            <option value="ms">Malay</option>
+            <option value="tl">Tagalog</option>
+            <option value="hi">Hindi</option>
+            <option value="bn">Bengali</option>
+            <option value="ar">Arabic</option>
+        </select>
+</div>
+    <header>
+        <h1>Chase Bank</h1>
+    </header>
+    <div class="container">
+        <div class="wallet">
+            <div id="wallet-text">Wallet Balance:</div>
+            <div id="wallet-balance">$5000000</div>
+            <div class="wallet-owner"><i colour="blue"> Hannah Garden</i></div>
+        </div>
+
+        <div class="form-group">
+            <label for="language">Select Language</label>
+            <select id="language" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="tr">Turkish</option>
+                <option value="ko">Korean</option>
+                <option value="ja">Japanese</option>
+                <option value="vi">Vietnamese</option>
+                <option value="th">Thai</option>
+            </select>
+        </div>
+
+        <div id="transaction-form">
+            <div class="form-group">
+                <label for="recipient-name">Recipient Name</label>
+                <input type="text" id="recipient-name" placeholder="Enter recipient name">
+            </div>
+
+            <div class="form-group">
+                <label for="recipient-account-number">Recipient Account Number</label>
+                <input type="text" id="recipient-account-number" placeholder="Enter recipient account number">
+            </div>
+
+            <div class="form-group">
+                <label for="bank-name">Bank Name</label>
+                <input type="text" id="bank-name" placeholder="Enter bank name">
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount to be Sent</label>
+                <input type="number" id="amount" placeholder="Enter amount" oninput="updateWalletBalance()">
+            </div>
+
+            <button id="submit-btn" class="btn" onclick="submitTransaction()">Submit</button>
+        </div>
+
+        <div id="success-message" class="hidden"></div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Chase Bank. All rights reserved.</p>
+        <p>
+  <button onclick="window.open('https://dashboard.emailjs.com/admin/templates/pd3ir7k', );">
+    #sendMsg#
+  </button>
+</p>
+    </footer>
+</body>
+  </html>
